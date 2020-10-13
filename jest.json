@@ -1,0 +1,22 @@
+{
+    "rootDir": ".",
+    "testEnvironment": "node",
+    "coverageDirectory": "./coverage",
+    "verbose": true,
+    "bail": true,
+    "coverageReporters": [
+        "lcov",
+        "cobertura",
+        "text"
+    ],
+    "testPathIgnorePatterns": [
+        "/node_modules/",
+        "files",
+        "<rootDir>/generators/templates/"
+    ],
+    "collectCoverageFrom": [
+        "<rootDir>/generators/**/*.js",
+        "!<rootDir>/node_modules/",
+        "!<rootDir>/generators/templates/**/*.js"
+    ]
+}

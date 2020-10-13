@@ -1,0 +1,9 @@
+{
+  "generator-node": {
+    "promptValues": {
+      "authorName": "Piotr Karpala",
+      "authorEmail": "pkarpala@infusion.com",
+      "authorUrl": ""
+    }
+  }
+}
