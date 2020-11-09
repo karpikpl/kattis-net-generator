@@ -16,8 +16,7 @@ class functionGenerator extends generator {
     showLogo(this.log);
   }
 
-  logInfo(msg)
-  {
+  logInfo(msg) {
     this.log(chalk.green(msg));
   }
 
@@ -35,7 +34,13 @@ class functionGenerator extends generator {
           }
           return true;
         },
-      }
+      },
+      {
+        type: 'input',
+        name: 'url',
+        message: 'Custom URL of the sample data files',
+        default: `https://open.kattis.com/problems/${this.answers.problem}/file/statement/samples.zip`,
+      },
     ];
     this.answers = await this.prompt(promptQuestions);
   }
@@ -46,11 +51,11 @@ class functionGenerator extends generator {
 
   async writing() {
     // first get the DB entities
-      this.logInfo('Copying files');
-      const model = {
-        problem: this.answers.problem
-      }
-      
+    this.logInfo('Copying files');
+    const model = {
+      problem: this.answers.problem,
+    };
+
     const files = glob.sync('**', {
       dot: true,
       nodir: true,
@@ -59,35 +64,45 @@ class functionGenerator extends generator {
 
     for (let i in files) {
       this.fs.copyTpl(
-        this.templatePath( files[i]),
+        this.templatePath(files[i]),
         this.destinationPath(files[i]),
         model
       );
     }
 
-      const url = `https://open.kattis.com/problems/${this.answers.problem}/file/statement/samples.zip`;
-      const response = await fetch(url);
-      this.logInfo(`Downloaded sample data from: ${chalk.green(url)} status: ${JSON.stringify(response)}`);
-  
-      if(response.status !== 200) {
-        this.log(chalk.red(`Could not download sample files - status code: ${response.status}`));
-        return;
-      }
+    const url = this.answers.url;
+    const response = await fetch(url);
+    this.logInfo(
+      `Downloaded sample data from: ${chalk.green(
+        url
+      )} status: ${JSON.stringify(response)}`
+    );
 
-      const buff = await response.buffer();
-  
-      // get the problem file
-      // download and unzip
-      const AdmZip = require('adm-zip');
-      const zip = new AdmZip(buff);
-  
-      const samplesDirectory = this.destinationPath(path.join('Tests', 'Samples'));
-  
-      zip.extractAllTo(samplesDirectory);
+    if (response.status !== 200) {
+      this.log(
+        chalk.red(
+          `Could not download sample files - status code: ${response.status}`
+        )
+      );
+      return;
+    }
+
+    const buff = await response.buffer();
+
+    // get the problem file
+    // download and unzip
+    const zip = new AdmZip(buff);
+
+    const samplesDirectory = this.destinationPath(
+      path.join('Tests', 'Samples')
+    );
+
+    zip.extractAllTo(samplesDirectory);
   }
 
-  end() {
-
+  install() {
+    this.spawnCommandSync('git', ['init']);
+    return this.installDependencies({ bower: false });
   }
 }
 
