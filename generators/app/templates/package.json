@@ -1,0 +1,10 @@
+{
+    "name": "kattis-solution-<%= problem %>",
+    "version": "1.0.0",
+    "description": "Solution for <%= problem %>",
+    "scripts": {
+        "submit": "cp ../.kattisrc . && python3 submit.py -p <%= problem %> -f ./Solution/Program.cs ./Solution/InputOutput.cs"
+    },
+    "author": "Piotr Karpala",
+    "license": "ISC"
+}
