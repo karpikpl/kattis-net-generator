@@ -39,7 +39,6 @@ class functionGenerator extends generator {
         type: 'input',
         name: 'url',
         message: 'Custom URL of the sample data files',
-        default: `https://open.kattis.com/problems/${this.answers.problem}/file/statement/samples.zip`,
       },
     ];
     this.answers = await this.prompt(promptQuestions);
@@ -70,7 +69,9 @@ class functionGenerator extends generator {
       );
     }
 
-    const url = this.answers.url;
+    const url =
+      this.answers.url ||
+      `https://open.kattis.com/problems/${this.answers.problem}/file/statement/samples.zip`;
     const response = await fetch(url);
     this.logInfo(
       `Downloaded sample data from: ${chalk.green(
