@@ -85,6 +85,7 @@ class functionGenerator extends generator {
     const pathsToCheck = [
       '/usr/local/etc/kattisrc',
       os.homedir() + '/.kattisrc',
+      this.destinationPath('../.kattisrc'),
       this.destinationPath('.kattisrc'),
     ];
     const kattisrcFoundId = (
