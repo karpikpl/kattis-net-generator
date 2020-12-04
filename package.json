@@ -23,6 +23,7 @@
     "adm-zip": "^0.4.16",
     "array.prototype.flatmap": "^1.2.3",
     "chalk": "^4.1.0",
+    "configparser": "^0.3.7",
     "glob": "^7.1.6",
     "node-fetch": "^2.6.0",
     "yeoman-generator": "^4.11.0"
