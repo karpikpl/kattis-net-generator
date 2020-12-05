@@ -5,6 +5,16 @@ const AdmZip = require('adm-zip');
 const path = require('path');
 const generator = require('yeoman-generator');
 const glob = require('glob');
+const ConfigParser = require('configparser');
+const fs = require('fs');
+const os = require('os');
+
+async function checkFileExists(path) {
+  return fs.promises
+    .access(path, fs.constants.F_OK)
+    .then(() => true)
+    .catch(() => false);
+}
 
 class functionGenerator extends generator {
   constructor(args, opts) {
@@ -38,7 +48,8 @@ class functionGenerator extends generator {
       {
         type: 'input',
         name: 'url',
-        message: 'Custom URL of the sample data files',
+        message:
+          'Custom URL of the sample data files (defaults to hostname in kattisrc or open kattis, if none given)',
       },
     ];
     this.answers = await this.prompt(promptQuestions);
@@ -69,9 +80,25 @@ class functionGenerator extends generator {
       );
     }
 
+    // Build default URL from kattisrc
+    // Check the same locations the official submit.py checks
+    const pathsToCheck = [
+      '/usr/local/etc/kattisrc',
+      os.homedir() + '/.kattisrc',
+      this.destinationPath('../.kattisrc'),
+      this.destinationPath('.kattisrc'),
+    ];
+    const kattisrcFoundId = (
+      await Promise.all(pathsToCheck.map((item) => checkFileExists(item)))
+    ).lastIndexOf(true);
+    const config = new ConfigParser();
+    if (kattisrcFoundId > -1) {
+      config.read(pathsToCheck[kattisrcFoundId]);
+    }
+    const hostname = config.get('kattis', 'hostname') || 'open.kattis.com';
     const url =
       this.answers.url ||
-      `https://open.kattis.com/problems/${this.answers.problem}/file/statement/samples.zip`;
+      `https://${hostname}/problems/${this.answers.problem}/file/statement/samples.zip`;
     const response = await fetch(url);
     this.logInfo(
       `Downloaded sample data from: ${chalk.green(
