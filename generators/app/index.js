@@ -92,14 +92,38 @@ class functionGenerator extends generator {
       await Promise.all(pathsToCheck.map((item) => checkFileExists(item)))
     ).lastIndexOf(true);
     const config = new ConfigParser();
+    let cookies;
     if (kattisrcFoundId > -1) {
       config.read(pathsToCheck[kattisrcFoundId]);
+
+      // Login to kattis to collect auth cookie
+      const loginUrl = config.get('kattis', 'loginurl');
+
+      const loginData = new URLSearchParams({
+        user: config.get('user', 'username'),
+        token: config.get('user', 'token'),
+        script: true,
+      });
+      // post to loginUrl using form data
+
+      const response = await fetch(loginUrl, {
+        method: 'POST',
+        body: loginData,
+      });
+      const rawCookie = response.headers.raw()['set-cookie'];
+      cookies = rawCookie
+        .map((item) => {
+          const parts = item.split(';');
+          return parts[0];
+        })
+        .join(';');
+      this.logInfo(`Login ${chalk.green('success')} - ${cookies}`);
     }
     const hostname = config.get('kattis', 'hostname') || 'open.kattis.com';
     const url =
       this.answers.url ||
       `https://${hostname}/problems/${this.answers.problem}/file/statement/samples.zip`;
-    const response = await fetch(url);
+    const response = await fetch(url, { headers: { cookies } });
     this.logInfo(
       `Downloaded sample data from: ${chalk.green(
         url
