@@ -20,6 +20,7 @@ class functionGenerator extends generator {
   constructor(args, opts) {
     // Calling the super constructor is important so our generator is correctly set up
     super(args, opts);
+    this.env.options.nodePackageManager = 'npm';
   }
 
   async initializing() {
@@ -64,6 +65,8 @@ class functionGenerator extends generator {
     this.logInfo('Copying files');
     const model = {
       problem: this.answers.problem,
+      path: this.destinationPath(),
+      contestHome: path.parse(this.destinationPath()).dir,
     };
 
     const files = glob.sync('**', {
@@ -154,7 +157,6 @@ class functionGenerator extends generator {
 
   install() {
     this.spawnCommandSync('git', ['init']);
-    return this.installDependencies({ bower: false });
   }
 }
 
